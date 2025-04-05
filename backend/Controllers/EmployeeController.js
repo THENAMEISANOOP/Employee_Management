@@ -2,28 +2,44 @@ const EmployeeModel = require('../Models/EmployeeModel');
 
 const createEmployee = async (req, res) => {
     try {
-        const body = req.body;
-        const profileImage = req.file ? req.file.path : null;
-        console.log(body)
-
-        // Assign profileImage to body before creating the EmployeeModel instance
-        const emp = new EmployeeModel({ ...body, profileImage });
-
-        await emp.save();
-
-        return res.status(201).json({
-            message: "Employee created",
-            success: true,
-            employee: emp, // Return the created employee for confirmation
-        });
+      const body = req.body;
+      const profileImage = req.file ? req.file.path : null;
+  
+      console.log("Body from req.body:", body);
+      console.log("File from req.file:", req.file);
+  
+      body.salary = Number(body.salary); // Ensure salary is number
+  
+      const emp = new EmployeeModel({ ...body, profileImage });
+  
+      console.log("Saving employee...");
+      await emp.save();
+      console.log("Employee saved:", emp);
+  
+      return res.status(201).json({
+        message: "Employee created",
+        success: true,
+        employee: emp,
+      });
     } catch (error) {
-        return res.status(500).json({
-            message: "Internal server error",
-            success: false,
-            error: error.message, // Send only the error message
+      console.error("Error creating employee:", error);
+  
+      if (error.code === 11000) {
+        return res.status(400).json({
+          message: "Email already exists",
+          success: false,
         });
+      }
+  
+      return res.status(500).json({
+        message: "Internal server error",
+        success: false,
+        error: error.message,
+      });
     }
-};
+  };
+  
+
 
 const getAllEmployees = async (req, res) => {
     try {
@@ -60,7 +76,7 @@ const getAllEmployees = async (req, res) => {
         return res.status(200).json({
             message: "All Employees",
             success: true,
-            employees: emps,
+            employee: emps,
             pagination: {
                 totalEmployees,
                 currentPage: page,
@@ -86,7 +102,8 @@ const getEmployeeById = async (req, res) => {
         return res.status(200).json({
             message: "Get Employees Details",
             success: true,
-            employees: emp, // Use 'employees' instead of 'employee' for clarity
+            employee: emp
+ 
         });
     } catch (error) {
         return res.status(500).json({

@@ -1,19 +1,25 @@
-const express  = require ('express')
-const app= express();
-const bodyParser = require('body-parser')
+const express = require('express');
+const cors = require('cors');
 require('dotenv').config();
-require('./Models/db')
-const EmployeeRouter =require('./Routes/EmployeRoute')
+require('./Models/db');
+
+const EmployeeRouter = require('./Routes/EmployeRoute');
+
+const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(bodyParser.json())
+// Middlewares
+app.use(cors());
+app.use(express.json());
 
-app.get('/',(req,res)=>{
-    res.send("employee  mgm server is running")
-})
+// Routes
+app.get('/', (req, res) => {
+    res.send("Employee management server is running");
+});
 
-app.use('/api/employees',EmployeeRouter)
+app.use('/api/employees', EmployeeRouter);
 
-app.listen(PORT,()=>{
-    console.log(`serever is running on ${PORT}`)
-})
+// Start server
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
